@@ -1,6 +1,6 @@
 define unit_test
-	(curl -v -k -i http://fou.test/hello && @echo "HELLO WORLD for Istio $(1) PASSED") || \
-		@echo "HELLO WORLD for Istio $(1) FAILED"
+	(curl --silent -v -k -i http://fou.test/hello && echo "HELLO WORLD for Istio $(1) PASSED") || \
+		echo "HELLO WORLD for Istio $(1) FAILED"
 endef
 
 define using_istio
@@ -82,8 +82,13 @@ istio_1_4_0_beta_1:
 delete:
 	kubectl apply -k $(K8S_BASE_PATH)/init
 	kubectl apply -k ./nginx-ingress
-	sleep 4
 	kubectl apply -k $(K8S_BASE_PATH)/main
-	sleep 4
 	kubectl apply -k ./helloworld
-	sleep 4
+
+.PHONY: events
+events:
+	kubectl get events --all-namespaces -w
+
+.PHONY: logs
+logs:
+	kubectl logs -f -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
