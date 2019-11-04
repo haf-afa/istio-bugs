@@ -1,3 +1,8 @@
+define unit_test
+	(curl -v -k -i http://fou.test/hello && @echo "HELLO WORLD for Istio $(1) PASSED") || \
+		@echo "HELLO WORLD for Istio $(1) FAILED"
+endef
+
 define using_istio
 	$(eval HELM_PATH := istio-$(1)/install/kubernetes/helm)
 	$(eval K8S_BASE_PATH := istio-$(1)/k8s)
@@ -44,7 +49,17 @@ define using_istio
 	kubectl apply -k ./helloworld
 	sleep 4
 
-	curl -v -k -i http://fou.test/hello || @echo "HELLO WORLD for Istio $(1) FAILED"
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
 endef
 
 .PHONY: istio_1_2_8
