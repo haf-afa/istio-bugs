@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld
+  namespace: fou
+  labels:
+    app: helloworld
+spec:
+  ports:
+  - port: 5000
+    name: http
+  selector:
+    app: helloworld
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-v1
+  namespace: fou
+  labels:
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: helloworld
+        version: v1
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: helloworld
+        image: docker.io/istio/examples-helloworld-v1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /hello
+            port: 5000
+          initialDelaySeconds: 2
+          periodSeconds: 10
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-v2
+  namespace: fou
+  labels:
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: helloworld
+        version: v2
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: helloworld
+        image: docker.io/istio/examples-helloworld-v2
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /hello
+            port: 5000
+          initialDelaySeconds: 2
+          periodSeconds: 10
