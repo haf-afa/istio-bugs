@@ -2,8 +2,9 @@ define using_istio
 	$(eval HELM_PATH := istio-$(1)/install/kubernetes/helm)
 	$(eval K8S_BASE_PATH := istio-$(1)/k8s)
 
-
-	curl --silent -L https://git.io/getLatestIstio | ISTIO_VERSION=$(1) sh -
+	# if [ -z istio-$(1)/.done ]; then
+	test -s istio-$(1)/.done || (curl --silent -L https://git.io/getLatestIstio | ISTIO_VERSION=$(1) sh -)
+	# fi
 	touch istio-$(1)/.done
 
 	kubectl create ns istio-system 2>/dev/null || true
@@ -61,3 +62,13 @@ istio_1_3_4:
 .PHONY: istio_1_4_0_beta_1
 istio_1_4_0_beta_1:
 	$(call using_istio,1.4.0-beta.1)
+
+.PHONY: delete
+delete:
+	kubectl apply -k $(K8S_BASE_PATH)/init
+	kubectl apply -k ./nginx-ingress
+	sleep 4
+	kubectl apply -k $(K8S_BASE_PATH)/main
+	sleep 4
+	kubectl apply -k ./helloworld
+	sleep 4
