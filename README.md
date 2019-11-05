@@ -1,8 +1,13 @@
 # Update SOLUTION
 
 - `global.mtls.enabled=false`
-  Does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS.
-
+  Does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS. Corollary: setting it to `true` sets
+  ```yaml
+     spec:
+       peers:
+       - mtls: {}
+  ```
+  which presumably means `STRICT` mTLS, causing Envoy to reject all non-TLS requests, causing nginx-ingress to say `502 Gateway Error`
 
 # Istio Bugs
 
