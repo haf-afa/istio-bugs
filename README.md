@@ -15,6 +15,12 @@ Have a look at the Makefile for different targets to run.
 
 Istio-Ingress Gateway was so utterly buggy that it's not even in this repo at the time of writing, so we're using nginx-ingress instead. All routing is between that ingress controller and the helloworld service.
 
+Related to:
+
+- https://github.com/istio/istio/issues/18221
+- https://github.com/istio/istio/issues/18225
+- https://github.com/istio/istio/issues/18467
+
 Here's an example run after doing a Kubernetes reset:
 
 ```
