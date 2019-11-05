@@ -1,3 +1,9 @@
+# Update SOLUTION
+
+- global.mtls.enabled=false
+  Does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS.
+
+
 # Istio Bugs
 
 Istio is very buggy and causes a lot of headaches in dev. This repo is about trying to isolate these bugs in easy-to-reproduce form.
