@@ -1,13 +1,19 @@
-# Update SOLUTION
+# SOLUTION 502 Gateway Error when `global.mtls.enabled=true`
 
 - `global.mtls.enabled=false`
-  Does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS. Corollary: setting it to `true` sets
+  This does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS. Corollary: setting it to `true` sets
   ```yaml
      spec:
        peers:
        - mtls: {}
   ```
-  which presumably means `STRICT` mTLS, causing Envoy to reject all non-TLS requests, causing nginx-ingress to say `502 Gateway Error`
+  which presumably means `STRICT` mTLS, causing Envoy to reject all non-TLS requests, causing nginx-ingress to say `502 Gateway Error`. See this commit https://github.com/haf-afa/istio-bugs/commit/0bd85d7fe71bba683dcbfca7d1b41ef6bda2a6a4 message and the `DestinationRule` you can add for `*.local` hosts, to make Istio upgrade to mTLS whenever possible.
+
+## Pending:
+
+- SDS on Docker Desktop; won't work since they've oped into "Trustworthy JWTs" which we don't have (yet) on D/D (won't fix)
+- 503s on quick consecutive Updates to Istio Ingress Gateways + Virtual Services (repro needed)
+- Readyness/liveness probe rewrites for HTTPS health endpoints
 
 # Istio Bugs
 
