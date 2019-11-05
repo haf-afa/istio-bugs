@@ -4,6 +4,28 @@ define unit_test
 		echo "HELLO WORLD for Istio $(1) FAILED"
 endef
 
+define unit_test_batch
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+	sleep 10
+	$(call unit_test)
+endef
+
 define using_istio
 	$(eval HELM_PATH := istio-$(1)/install/kubernetes/helm)
 	$(eval K8S_BASE_PATH := istio-$(1)/k8s)
@@ -50,17 +72,7 @@ define using_istio
 	sleep 8
 	kubectl apply -k ./helloworld
 
-	$(call unit_test)
-	sleep 10
-	$(call unit_test)
-	sleep 10
-	$(call unit_test)
-	sleep 10
-	$(call unit_test)
-	sleep 10
-	$(call unit_test)
-	sleep 10
-	$(call unit_test)
+	$(call unit_test_batch)
 endef
 
 .PHONY: istio_1_2_8
@@ -78,6 +90,10 @@ istio_1_3_4:
 .PHONY: istio_1_4_0_beta_1
 istio_1_4_0_beta_1:
 	$(call using_istio,1.4.0-beta.1)
+
+.PHONY: test
+test:
+	$(call unit_test_batch)
 
 .PHONY: delete
 delete:
