@@ -1,6 +1,6 @@
 # Update SOLUTION
 
-- global.mtls.enabled=false
+- `global.mtls.enabled=false`
   Does NOT mean it is DISABLED, only that MeshPolicy has PERMISSIVE "peer" mTLS.
 
 
