@@ -8,6 +8,7 @@ metadata:
 spec:
   ports:
   - port: 5000
+    targetPort: http
     name: http
   selector:
     app: helloworld
@@ -45,7 +46,8 @@ spec:
             memory: 128Mi
         imagePullPolicy: IfNotPresent #Always
         ports:
-        - containerPort: 5000
+        - name: http
+          containerPort: 5000
         livenessProbe:
           httpGet:
             path: /hello
@@ -86,7 +88,8 @@ spec:
             memory: 128Mi
         imagePullPolicy: IfNotPresent #Always
         ports:
-        - containerPort: 5000
+        - name: http
+          containerPort: 5000
         livenessProbe:
           httpGet:
             path: /hello
