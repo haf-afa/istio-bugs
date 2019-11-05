@@ -1,5 +1,6 @@
 define unit_test
-	(curl --silent -v -k -i http://fou.test/hello && echo "HELLO WORLD for Istio $(1) PASSED") || \
+	((curl --silent -v -k -i http://fou.test/hello | grep '200 OK') && \
+			echo "HELLO WORLD for Istio $(1) PASSED") || \
 		echo "HELLO WORLD for Istio $(1) FAILED"
 endef
 
@@ -14,6 +15,7 @@ define using_istio
 
 	kubectl create ns istio-system 2>/dev/null || true
 	kubectl create ns fou 2>/dev/null || true
+	kubectl label ns fou istio-injection=enabled 2>/dev/null || true
 
 	mkdir -p $(K8S_BASE_PATH)/init
 	cp kustomization.yaml $(K8S_BASE_PATH)/init
@@ -43,11 +45,10 @@ define using_istio
 
 	kubectl apply -k $(K8S_BASE_PATH)/init
 	kubectl apply -k ./nginx-ingress
-	sleep 4
+	sleep 10
 	kubectl apply -k $(K8S_BASE_PATH)/main
-	sleep 4
+	sleep 8
 	kubectl apply -k ./helloworld
-	sleep 4
 
 	$(call unit_test)
 	sleep 10
