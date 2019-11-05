@@ -5,34 +5,34 @@ define unit_test
 endef
 
 define unit_test_batch
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
 	sleep 10
-	$(call unit_test)
+	$(call unit_test,$(1))
+	sleep 10
+	$(call unit_test,$(1))
 endef
 
 define using_istio
 	$(eval HELM_PATH := istio-$(1)/install/kubernetes/helm)
 	$(eval K8S_BASE_PATH := istio-$(1)/k8s)
 
-	# if [ -z istio-$(1)/.done ]; then
-	test -s istio-$(1)/.done || (curl --silent -L https://git.io/getLatestIstio | ISTIO_VERSION=$(1) sh -)
-	# fi
+	[[ -r istio-$(1)/.done ]] || (curl --silent -L https://git.io/getLatestIstio | ISTIO_VERSION=$(1) sh -)
 	touch istio-$(1)/.done
 
 	kubectl create ns istio-system 2>/dev/null || true
@@ -54,7 +54,8 @@ define using_istio
 		--values $(HELM_PATH)/istio/values.yaml \
 		--set sidecarInjectorWebhook.enabled=true \
 		--set sidecarInjectorWebhook.rewriteAppHTTPProbe=true \
-		--set global.mtls.enabled=true \
+		--set global.mtls.enabled=false \
+		--set global.controlPlaneSecurity=false \
 		--set global.proxy.accessLogFile="/dev/stdout" \
 		--set global.tracer.zipkin.address=jaeger-collector.monitoring:9411 \
 		--set global.gateways.enabled=false \
@@ -69,10 +70,11 @@ define using_istio
 	kubectl apply -k ./nginx-ingress
 	sleep 10
 	kubectl apply -k $(K8S_BASE_PATH)/main
+	kubectl apply -f dr.yaml # default to mTLS for *.local hosts
 	sleep 8
 	kubectl apply -k ./helloworld
 
-	$(call unit_test_batch)
+	$(call unit_test_batch,$(1))
 endef
 
 .PHONY: istio_1_2_8
